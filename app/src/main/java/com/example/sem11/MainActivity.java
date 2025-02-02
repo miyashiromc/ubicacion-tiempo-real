@@ -1,6 +1,7 @@
 package com.example.sem11;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +49,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         edtxtLatitud = findViewById(R.id.edtxt_latitud);
         edtxtLongitud = findViewById(R.id.edtxt_longitud);
 
+        // Inicializar botón para cambiar a monitoreo
+        Button btnMonitoreo = findViewById(R.id.btn_monitoreo);
+        btnMonitoreo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Abrir el Activity de monitoreo
+                Intent intent = new Intent(MainActivity.this, monitoreo.class);
+                startActivity(intent);
+            }
+        });
+
         // Inicializar Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("Coordenadas");
 
@@ -77,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void configurarActualizacionesDeUbicacion() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000); // Actualizaciones cada 1 segundo
+        locationRequest.setInterval(10); // Actualizaciones cada 1 segundo
 
         locationCallback = new LocationCallback() {
             @Override
@@ -141,7 +155,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             marcadorActual.setPosition(nuevaPosicion);
         }
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nuevaPosicion, 15));
+
+        // Obtener el nivel de zoom actual
+        float zoomActual = mMap.getCameraPosition().zoom;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(nuevaPosicion, zoomActual));
     }
 
     @Override
